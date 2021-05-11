@@ -3,7 +3,7 @@ const path = require('path')
 const contactsPath = path.join('./model/contacts.json')
 const {v4: uuid} = require('uuid');
 
-const listContacts = async () => {
+const getContacts = async () => {
   try {
     const data = await fs.readFile(contactsPath)
     const contacts = JSON.parse(data)
@@ -15,7 +15,7 @@ const listContacts = async () => {
 
 const getContactById = async (contactId) => {
   try {
-    const contacts = await listContacts()
+    const contacts = await getContacts()
     const findContact = contacts.find(({ id }) => id.toString() === contactId)
     return findContact
   } catch (error) {
@@ -25,11 +25,10 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   try {
-    const contacts = await listContacts()
+    const contacts = await getContacts()
     const filterContacts = contacts.filter(({ id }) => id.toString() !== contactId)
     if (contacts.length !== filterContacts.length) {
-      await fs.writeFile(contactsPath, JSON.stringify(filterContacts, null, 2))
-      return true
+      return await fs.writeFile(contactsPath, JSON.stringify(filterContacts, null, 2))
     }
     return false
   } catch (error) {
@@ -39,7 +38,7 @@ const removeContact = async (contactId) => {
 
 const addContact = async (body) => {
    try {
-    const contacts = await listContacts()
+    const contacts = await getContacts()
     const id = uuid()
     const newContact = {
       id,
@@ -55,7 +54,7 @@ const addContact = async (body) => {
 
 const updateContact = async (contactId, body) => {
   try {
-      const contacts = await listContacts()
+      const contacts = await getContacts()
       let newContact = ''
       const newContacts = contacts.map((data) => {
         if (data.id.toString() === contactId) {
@@ -74,7 +73,7 @@ const updateContact = async (contactId, body) => {
 }
 
 module.exports = {
-  listContacts,
+  getContacts,
   getContactById,
   removeContact,
   addContact,
