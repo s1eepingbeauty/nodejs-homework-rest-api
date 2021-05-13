@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Contacts = require('../../model/contacts')
 const {
-  validateAddContact,
+  validateCreateContact,
   validateUpdateContact,
   validateStatusFavorite,
 } = require('./validation')
@@ -22,10 +22,11 @@ router.get('/:contactId', async (req, res, next) => {
   const id = req.params.contactId
   try {
     const contact = await Contacts.getContactById(id)
+    console.log(contact) // toObject
     if (contact) {
       return res
         .status(200)
-        .json({ status: 'success', code: 200, data: { contact } })
+        .json({ status: 'success', code: 200, data: { contact } }) // toJSON
     }
     return res
       .status(404)
@@ -35,14 +36,17 @@ router.get('/:contactId', async (req, res, next) => {
   }
 })
 
-router.post('/', validateAddContact, async (req, res, next) => {
+router.post('/', validateCreateContact, async (req, res, next) => {
   const body = req.body
   try {
-    const contact = await Contacts.addContact(body)
+    const contact = await Contacts.createContact(body)
     return res
       .status(201)
       .json({ status: 'created', code: 201, data: { contact } })
   } catch (error) {
+    if (error.name === 'ValidationError') {
+      error.status = 400
+    }
     next(error)
   }
 })
@@ -89,7 +93,7 @@ router.patch(
     const id = req.params.contactId
     const body = req.body
     try {
-      const contact = await Contacts.updateContact(id, body)
+      const contact = await Contacts.updateStatusContact(id, body)
       if (contact) {
         return res
           .status(200)

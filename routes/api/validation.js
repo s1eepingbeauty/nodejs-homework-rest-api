@@ -1,12 +1,17 @@
 const Joi = require('joi')
 
-const addContactSchema = Joi.object({
-  name: Joi.string().min(3).max(30).required().messages({
-    'string.empty': `"name" cannot be an empty field`,
-    'string.min': `"name" filed should contains at least 3 characters`,
-    'string.max': `"name" filed limit is 30 characters`,
-    'any.required': `"name" is a required field`,
-  }),
+const createContactSchema = Joi.object({
+  name: Joi.string()
+    .min(3)
+    .max(30)
+    .regex(/[A-Z]\w+/)
+    .required()
+    .messages({
+      'string.empty': `"name" cannot be an empty field`,
+      'string.min': `"name" should contains at least 3 characters`,
+      'string.max': `"name" limit is 30 characters`,
+      'any.required': `"name" is a required field`,
+    }),
 
   email: Joi.string()
     .email({
@@ -31,11 +36,16 @@ const addContactSchema = Joi.object({
 })
 
 const updateContactSchema = Joi.object({
-  name: Joi.string().min(3).max(30).optional().messages({
-    'string.empty': `"name" cannot be an empty field`,
-    'string.min': `"name" should contains at least 3 characters`,
-    'string.max': `"name" limit is 30 characters`,
-  }),
+  name: Joi.string()
+    .min(3)
+    .max(30)
+    .regex(/[A-Z]\w+/)
+    .optional()
+    .messages({
+      'string.empty': `"name" cannot be an empty field`,
+      'string.min': `"name" should contains at least 3 characters`,
+      'string.max': `"name" limit is 30 characters`,
+    }),
 
   email: Joi.string()
     .email({
@@ -59,7 +69,10 @@ const updateContactSchema = Joi.object({
 })
 
 const statusFavotiteSchema = Joi.object({
-  favorite: Joi.boolean().required(),
+  favorite: Joi.boolean().required().messages({
+    'string.empty': `"favorite" cannot be an empty field`,
+    'any.required': `"favorite" is a required field`,
+  }),
 })
 
 const validate = async (schema, body, next) => {
@@ -72,8 +85,8 @@ const validate = async (schema, body, next) => {
   }
 }
 
-const validateAddContact = async (req, _res, next) => {
-  return validate(addContactSchema, req.body, next)
+const validateCreateContact = async (req, _res, next) => {
+  return validate(createContactSchema, req.body, next)
 }
 
 const validateUpdateContact = async (req, _res, next) => {
@@ -84,7 +97,7 @@ const validateStatusFavorite = async (req, _res, next) => {
 }
 
 module.exports = {
-  validateAddContact,
+  validateCreateContact,
   validateUpdateContact,
   validateStatusFavorite,
 }

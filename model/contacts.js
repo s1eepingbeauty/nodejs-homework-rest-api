@@ -1,62 +1,42 @@
-const db = require('./db')
-const { ObjectId } = require('mongodb')
-
-const getCollection = async (db, name) => {
-  const client = await db
-  const collection = await client.db().collection(name)
-  return collection
-}
+const Contact = require('./schemas/contact')
 
 const getContacts = async () => {
-  const collection = await getCollection(db, 'contacts')
-  const result = await collection.find({}).toArray() // find возвращает курсор, преобразовываем курсор в массив
-  return result
+  return await Contact.find({})
 }
 
 const getContactById = async contactId => {
-  const collection = await getCollection(db, 'contacts')
-  const [result] = await collection
-    .find({ _id: new ObjectId(contactId) })
-    .toArray()
-  return result
+  return await Contact.findOne({ _id: contactId })
+}
+
+const createContact = async body => {
+  return await Contact.create(body)
 }
 
 const removeContact = async contactId => {
-  const collection = await getCollection(db, 'contacts')
-  const { value: result } = await collection.findOneAndDelete({
-    _id: new ObjectId(contactId),
-  })
-  return result
-}
-
-const addContact = async body => {
-  const collection = await getCollection(db, 'contacts')
-  const record = {
-    ...body,
-    ...(body.favorite ? {} : { favorite: false }),
-  }
-  const {
-    ops: [result],
-  } = await collection.insertOne(record)
-  return result
+  return await Contact.findByIdAndRemove({ _id: contactId })
 }
 
 const updateContact = async (contactId, body) => {
-  const collection = await getCollection(db, 'contacts')
-  const { value: result } = await collection.findOneAndUpdate(
-    {
-      _id: new ObjectId(contactId),
-    },
-    { $set: body },
-    { returnOriginal: false },
+  return await Contact.findByIdAndUpdate(
+    { _id: contactId },
+    { ...body },
+    { new: true },
   )
-  return result
+}
+
+const updateStatusContact = async (contactId, body) => {
+  return await Contact.findOneAndUpdate(
+    { _id: contactId },
+    { ...body },
+    { new: true },
+  )
 }
 
 module.exports = {
   getContacts,
   getContactById,
+  createContact,
   removeContact,
-  addContact,
   updateContact,
+  updateStatusContact,
 }
