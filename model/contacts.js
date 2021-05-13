@@ -1,77 +1,56 @@
 const db = require('./db')
+const { ObjectId } = require('mongodb')
+
+const getCollection = async (db, name) => {
+  const client = await db
+  const collection = await client.db().collection(name)
+  return collection
+}
 
 const getContacts = async () => {
-  try {
-    const data = await fs.readFile(contactsPath)
-    const contacts = JSON.parse(data)
-    return contacts
-  } catch (error) {
-    console.log(error.message)
-  }
+  const collection = await getCollection(db, 'contacts')
+  const result = await collection.find({}).toArray() // find возвращает курсор, преобразовываем курсор в массив
+  return result
 }
 
 const getContactById = async contactId => {
-  try {
-    const contacts = await getContacts()
-    const findContact = contacts.find(({ id }) => id.toString() === contactId)
-    return findContact
-  } catch (error) {
-    console.log(error.message)
-  }
+  const collection = await getCollection(db, 'contacts')
+  const [result] = await collection
+    .find({ _id: new ObjectId(contactId) })
+    .toArray()
+  return result
 }
 
 const removeContact = async contactId => {
-  try {
-    const contacts = await getContacts()
-    const filterContacts = contacts.filter(
-      ({ id }) => id.toString() !== contactId,
-    )
-    if (contacts.length !== filterContacts.length) {
-      return await fs.writeFile(
-        contactsPath,
-        JSON.stringify(filterContacts, null, 2),
-      )
-    }
-    return false
-  } catch (error) {
-    console.log(error.message)
-  }
+  const collection = await getCollection(db, 'contacts')
+  const { value: result } = await collection.findOneAndDelete({
+    _id: new ObjectId(contactId),
+  })
+  return result
 }
 
 const addContact = async body => {
-  try {
-    const contacts = await getContacts()
-    const id = uuid()
-    const newContact = {
-      id,
-      ...body,
-    }
-    contacts.push(newContact)
-    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2))
-    return newContact
-  } catch (error) {
-    console.log(error.message)
+  const collection = await getCollection(db, 'contacts')
+  const record = {
+    ...body,
+    ...(body.favorite ? {} : { favorite: false }),
   }
+  const {
+    ops: [result],
+  } = await collection.insertOne(record)
+  return result
 }
 
 const updateContact = async (contactId, body) => {
-  try {
-    const contacts = await getContacts()
-    let newContact = ''
-    const newContacts = contacts.map(data => {
-      if (data.id.toString() === contactId) {
-        newContact = { ...data, ...body }
-        return newContact
-      }
-      return data
-    })
-    if (newContact !== '') {
-      await fs.writeFile(contactsPath, JSON.stringify(newContacts, null, 2))
-      return newContact
-    }
-  } catch (error) {
-    console.log(error.message)
-  }
+  const collection = await getCollection(db, 'contacts')
+  const { value: result } = await collection.findOneAndUpdate(
+    {
+      _id: new ObjectId(contactId),
+    },
+    { $set: body },
+    { returnOriginal: false },
+  )
+  return result
 }
 
 module.exports = {
