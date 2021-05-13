@@ -22,11 +22,10 @@ router.get('/:contactId', async (req, res, next) => {
   const id = req.params.contactId
   try {
     const contact = await Contacts.getContactById(id)
-    console.log(contact) // toObject
     if (contact) {
       return res
         .status(200)
-        .json({ status: 'success', code: 200, data: { contact } }) // toJSON
+        .json({ status: 'success', code: 200, data: { contact } })
     }
     return res
       .status(404)
