@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-const contactShema = new Schema(
+const contactSchema = new Schema(
   {
     name: {
       type: String,
@@ -23,12 +23,12 @@ const contactShema = new Schema(
   },
 )
 
-contactShema.path('name').validate(value => {
+contactSchema.path('name').validate(value => {
   // валидируем поля, не валидные данные не запишутся в базу
   const re = /[A-Z]\w+/
   return re.test(String(value))
 })
 
-const Contact = mongoose.model('contact', contactShema)
+const Contact = mongoose.model('contact', contactSchema)
 
 module.exports = Contact
