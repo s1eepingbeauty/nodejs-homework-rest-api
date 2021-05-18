@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const { Schema, SchemaTypes } = mongoose
 const { Subscription } = require('../../helpers/constants')
 const bcrypt = require('bcryptjs')
-const SALT_FACTOR = 6
+const SALT_FACTOR = 6 // количество итераций для солей
 
 const userSchema = new Schema(
   {
@@ -17,8 +17,13 @@ const userSchema = new Schema(
     },
     subscription: {
       type: String,
-      enum: [Subscription.STARTER, Subscription.PRO, Subscription.BUSSINES],
-      default: 'starter',
+      enum: [
+        Subscription.STARTER,
+        Subscription.PRO,
+        Subscription.BUSSINES,
+        'It not allowed',
+      ],
+      default: Subscription.STARTER,
     },
     token: {
       type: String,
@@ -34,11 +39,12 @@ const userSchema = new Schema(
     timestamps: true,
   },
 )
-// зашифровываем пароль перед записью в БД
+// зашифровываем пароль перед(pre) записью в БД
 userSchema.pre('save', async function (next) {
   // хэшировать только если изменяли пароль
   if (this.isModified('password')) {
     const salt = await bcrypt.genSalt(SALT_FACTOR)
+    // шифруем(хэшируем) пароль
     this.password = await bcrypt.hash(this.password, salt)
   }
   next()
