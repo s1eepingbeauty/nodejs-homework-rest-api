@@ -5,8 +5,10 @@ const { HttpCode } = require('../helpers/constants')
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 
 const signup = async (res, req, next) => {
+  console.log(req)
   try {
     const user = await Users.findByEmail(req.body.email)
+
     if (user) {
       return res.status(HttpCode.CONFLICT).json({
         status: 'error',
@@ -52,10 +54,7 @@ const login = async (res, req, next) => {
     return res.status(HttpCode.OK).json({
       status: 'success',
       code: HttpCode.OK,
-      data: {
-        token,
-        user,
-      },
+      data: { token },
     })
   } catch (error) {
     next(error)

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
-const { Schema, SchemaTypes } = mongoose
-const { Subscription } = require('../../helpers/constants')
 const bcrypt = require('bcryptjs')
+const { Schema, SchemaTypes, model } = mongoose
+const { Subscription } = require('../../helpers/constants')
 const SALT_FACTOR = 6 // количество итераций для солей
 
 const userSchema = new Schema(
@@ -54,6 +54,6 @@ userSchema.methods.validPassword = async function (password) {
   return await bcrypt.compare(String(password), this.password)
 }
 
-const User = mongoose.model('user', userSchema)
+const User = model('user', userSchema)
 
 module.exports = User
