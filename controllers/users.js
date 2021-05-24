@@ -17,14 +17,13 @@ const signup = async (req, res, next) => {
     }
 
     const newUser = await Users.create(req.body)
-    const { email, subscribtion } = newUser
-
+    const { email, subscription } = newUser
     return res.status(HttpCode.CREATED).json({
       status: 'success',
       code: HttpCode.CREATED,
       data: {
         email,
-        subscribtion,
+        subscription,
       },
     })
   } catch (error) {

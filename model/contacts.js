@@ -1,24 +1,24 @@
 const Contact = require('./schemas/contact')
 
-const getContacts = async () => {
-  return await Contact.find({})
+const getContacts = async userId => {
+  return await Contact.find({ owner: userId })
 }
 
-const getContactById = async contactId => {
-  return await Contact.findOne({ _id: contactId })
+const getContactById = async (userId, contactId) => {
+  return await Contact.findOne({ _id: contactId, owner: userId })
 }
 
 const createContact = async body => {
   return await Contact.create(body)
 }
 
-const removeContact = async contactId => {
-  return await Contact.findByIdAndRemove({ _id: contactId })
+const removeContact = async (userId, contactId) => {
+  return await Contact.findByIdAndRemove({ _id: contactId, owner: userId })
 }
 
-const updateContact = async (contactId, body) => {
+const updateContact = async (userId, contactId, body) => {
   return await Contact.findByIdAndUpdate(
-    { _id: contactId },
+    { _id: contactId, owner: userId },
     { ...body },
     { new: true },
   )
