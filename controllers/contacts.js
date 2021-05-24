@@ -1,8 +1,9 @@
 const Contacts = require('../model/contacts')
 const { HttpCode } = require('../helpers/constants')
 
-const getAll = async (_req, res, next) => {
+const getAll = async (req, res, next) => {
   try {
+    console.log(req.user)
     const contacts = await Contacts.getContacts()
     return res.status(HttpCode.OK).json({
       status: 'success',

@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const validate = require('./validate')
 
 const createContactSchema = Joi.object({
   name: Joi.string()
@@ -74,16 +75,6 @@ const statusFavotiteSchema = Joi.object({
     'any.required': `"favorite" is a required field`,
   }),
 })
-
-const validate = async (schema, body, next) => {
-  try {
-    await schema.validateAsync(body)
-    console.log('Validation success')
-    next()
-  } catch (error) {
-    next({ status: 400, message: `Field ${error.message.replace(/"/g, '|')}` })
-  }
-}
 
 const validateCreateContact = async (req, _res, next) => {
   return validate(createContactSchema, req.body, next)

@@ -4,8 +4,7 @@ const Users = require('../model/users')
 const { HttpCode } = require('../helpers/constants')
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 
-const signup = async (res, req, next) => {
-  console.log(req)
+const signup = async (req, res, next) => {
   try {
     const user = await Users.findByEmail(req.body.email)
 
@@ -33,9 +32,10 @@ const signup = async (res, req, next) => {
   }
 }
 
-const login = async (res, req, next) => {
+const login = async (req, res, next) => {
   try {
     const { email, password } = req.body
+
     const user = await Users.findByEmail(email)
     const isValidPassword = await user?.validPassword(password)
 
@@ -48,20 +48,26 @@ const login = async (res, req, next) => {
     }
 
     const payload = { id: user.id }
-    const token = jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: '2h' }) // токен будет жить 2 часа
+    const token = jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: '2h' })
     await Users.updateToken(user.id, token)
 
     return res.status(HttpCode.OK).json({
       status: 'success',
       code: HttpCode.OK,
-      data: { token },
+      data: {
+        token,
+        user: {
+          email: user.email,
+          subscription: user.subscription,
+        },
+      },
     })
   } catch (error) {
     next(error)
   }
 }
 
-const logout = async (res, req, next) => {}
+const logout = async (req, res, next) => {}
 
 module.exports = {
   signup,
