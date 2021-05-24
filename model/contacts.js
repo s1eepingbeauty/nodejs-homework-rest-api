@@ -5,7 +5,10 @@ const getContacts = async userId => {
 }
 
 const getContactById = async (userId, contactId) => {
-  return await Contact.findOne({ _id: contactId, owner: userId })
+  return await Contact.findOne({ _id: contactId, owner: userId }).populate({
+    path: 'owner',
+    select: 'email subscription -_id',
+  }) //  -_id - не показывать id
 }
 
 const createContact = async body => {
