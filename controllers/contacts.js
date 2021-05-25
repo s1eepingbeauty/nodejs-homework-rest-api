@@ -4,11 +4,14 @@ const { HttpCode } = require('../helpers/constants')
 const getAll = async (req, res, next) => {
   try {
     const userId = req.user.id
-    const contacts = await Contacts.getContacts(userId)
+    const { contacts, total, limit, page } = await Contacts.getContacts(
+      userId,
+      req.query,
+    )
     return res.status(HttpCode.OK).json({
       status: 'success',
       code: HttpCode.OK,
-      data: { contacts },
+      data: { total, limit, page, contacts },
     })
   } catch (error) {
     next(error)
@@ -99,24 +102,27 @@ const update = async (req, res, next) => {
   }
 }
 
-// const patch = async (req, res, next) => {
-//     const userId = req.user.id
-//     const contatcId = req.params.contactId
-//     const body = req.body
-//     try {
-//       const contact = await Contacts.updateStatusContact(userId, contactId, body)
-//       if (contact) {
-//         return res
-//           .status(HttpCode.OK)
-//           .json({ status: 'success', code: HttpCode.OK, data: { contact } })
-//       }
-//       return res
-//         .status(HttpCode.NOT_FOUND)
-//         .json({ status: 'error', code: HttpCode.NOT_FOUND, message: 'Not Found' })
-//     } catch (error) {
-//       next(error)
-//     }
-//   }
+const patch = async (req, res, next) => {
+  const userId = req.user.id
+  const contactId = req.params.contactId
+  const body = req.body
+
+  try {
+    const contact = await Contacts.updateStatusContact(userId, contactId, body)
+
+    if (contact) {
+      return res
+        .status(HttpCode.OK)
+        .json({ status: 'success', code: HttpCode.OK, data: { contact } })
+    }
+
+    return res
+      .status(HttpCode.NOT_FOUND)
+      .json({ status: 'error', code: HttpCode.NOT_FOUND, message: 'Not Found' })
+  } catch (error) {
+    next(error)
+  }
+}
 
 module.exports = {
   getAll,
@@ -124,4 +130,5 @@ module.exports = {
   create,
   remove,
   update,
+  patch,
 }

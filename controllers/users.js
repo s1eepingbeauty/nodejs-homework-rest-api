@@ -56,6 +56,7 @@ const login = async (req, res, next) => {
       data: {
         token,
         user: {
+          id: user.id,
           email: user.email,
           subscription: user.subscription,
         },
@@ -66,10 +67,47 @@ const login = async (req, res, next) => {
   }
 }
 
-const logout = async (req, res, next) => {}
+const logout = async (req, res, _next) => {
+  const userId = req.user.id
+  await Users.updateToken(userId, null)
+
+  return res.status(HttpCode.NO_CONTENT).json({})
+}
+
+const patch = async (req, res, next) => {
+  const userId = req.user.id
+  const body = req.body
+
+  try {
+    const user = await Users.updateSubscription(userId, body)
+
+    if (user) {
+      return res.status(HttpCode.OK).json({
+        status: 'success',
+        code: HttpCode.OK,
+        data: {
+          user: {
+            id: user.id,
+            email: user.email,
+            subscription: user.subscription,
+          },
+        },
+      })
+    }
+
+    return res.status(HttpCode.NOT_FOUND).json({
+      status: 'error',
+      code: HttpCode.NOT_FOUND,
+      message: 'Not Found',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 module.exports = {
   signup,
   login,
   logout,
+  patch,
 }

@@ -69,7 +69,7 @@ const updateContactSchema = Joi.object({
   favorite: Joi.boolean().optional(),
 })
 
-const statusFavotiteSchema = Joi.object({
+const statusFavoriteSchema = Joi.object({
   favorite: Joi.boolean().required().messages({
     'string.empty': `"favorite" cannot be an empty field`,
     'any.required': `"favorite" is a required field`,
@@ -84,7 +84,7 @@ const validateUpdateContact = async (req, _res, next) => {
   return validate(updateContactSchema, req.body, next)
 }
 const validateStatusFavorite = async (req, _res, next) => {
-  return validate(statusFavotiteSchema, req.body, next)
+  return validate(statusFavoriteSchema, req.body, next)
 }
 
 module.exports = {

@@ -23,10 +23,25 @@ const userSchema = Joi.object({
     'string.max': `"password" limit is 30 characters`,
     'any.required': `"password" is a required field`,
   }),
+  subscription: Joi.string().valid('starter', 'pro', 'business').optional(),
+})
+
+const subscriptionSchema = Joi.object({
+  subscription: Joi.string()
+    .valid('starter', 'pro', 'business')
+    .required()
+    .messages({
+      'string.empty': `"subscription" cannot be an empty field`,
+      'any.required': `"subscription" is a required field`,
+    }),
 })
 
 const validateUser = async (req, _res, next) => {
   return validate(userSchema, req.body, next)
 }
 
-module.exports = validateUser
+const validateSubscription = async (req, _res, next) => {
+  return validate(subscriptionSchema, req.body, next)
+}
+
+module.exports = { validateUser, validateSubscription }
