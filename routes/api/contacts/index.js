@@ -14,6 +14,6 @@ router.get('/:contactId', guard, ctrl.getByID)
 router.post('/', guard, validateCreateContact, ctrl.create)
 router.delete('/:contactId', guard, ctrl.remove)
 router.put('/:contactId', guard, validateUpdateContact, ctrl.update)
-router.patch('/:contactId/favorite', guard, validateStatusFavorite, ctrl.update)
+router.patch('/:contactId/favorite', guard, validateStatusFavorite, ctrl.patch)
 
 module.exports = router

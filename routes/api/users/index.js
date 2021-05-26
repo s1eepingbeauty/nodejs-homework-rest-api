@@ -11,5 +11,6 @@ router.post('/signup', validateUser, ctrl.signup)
 router.post('/login', validateUser, ctrl.login)
 router.post('/logout', guard, ctrl.logout)
 router.patch('/:userId/subscription', guard, validateSubscription, ctrl.patch)
+router.get('/current', guard, ctrl.currentUser)
 
 module.exports = router

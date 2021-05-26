@@ -105,9 +105,40 @@ const patch = async (req, res, next) => {
   }
 }
 
+const currentUser = async (req, res, next) => {
+  const userId = req.user.id
+
+  try {
+    const user = await Users.findById(userId)
+
+    if (!user || !user.token) {
+      return res.status(HttpCode.UNAUTHORIZED).json({
+        status: 'error',
+        code: HttpCode.UNAUTHORIZED,
+        message: 'Not authorized',
+      })
+    }
+
+    return res.status(HttpCode.OK).json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          subscription: user.subscription,
+        },
+      },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   signup,
   login,
   logout,
   patch,
+  currentUser,
 }
