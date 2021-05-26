@@ -1,7 +1,8 @@
 const mongoose = require('mongoose')
-const { Schema } = mongoose
+const { Schema, SchemaTypes, model } = mongoose
+const mongoosePaginate = require('mongoose-paginate-v2')
 
-const contactShema = new Schema(
+const contactSchema = new Schema(
   {
     name: {
       type: String,
@@ -17,18 +18,24 @@ const contactShema = new Schema(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: SchemaTypes.ObjectId,
+      ref: 'user',
+    },
   },
   {
-    versionKey: false, // отключаем версионность
+    versionKey: false,
+    timestamps: true,
   },
 )
 
-contactShema.path('name').validate(value => {
-  // валидируем поля, не валидные данные не запишутся в базу
+contactSchema.path('name').validate(value => {
   const re = /[A-Z]\w+/
   return re.test(String(value))
 })
 
-const Contact = mongoose.model('contact', contactShema)
+contactSchema.plugin(mongoosePaginate)
+
+const Contact = model('contact', contactSchema)
 
 module.exports = Contact
