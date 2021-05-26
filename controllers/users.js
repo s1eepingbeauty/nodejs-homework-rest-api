@@ -111,7 +111,7 @@ const currentUser = async (req, res, next) => {
   try {
     const user = await Users.findById(userId)
 
-    if (!user || !user.token) {
+    if (!user && !user.token) {
       return res.status(HttpCode.UNAUTHORIZED).json({
         status: 'error',
         code: HttpCode.UNAUTHORIZED,
