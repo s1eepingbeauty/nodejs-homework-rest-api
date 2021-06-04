@@ -17,13 +17,14 @@ const signup = async (req, res, next) => {
     }
 
     const newUser = await Users.create(req.body)
-    const { email, subscription } = newUser
+    const { email, subscription, avatar } = newUser
     return res.status(HttpCode.CREATED).json({
       status: 'success',
       code: HttpCode.CREATED,
       data: {
         email,
         subscription,
+        avatar,
       },
     })
   } catch (error) {
@@ -59,6 +60,7 @@ const login = async (req, res, next) => {
           id: user.id,
           email: user.email,
           subscription: user.subscription,
+          avatar: user.avatar,
         },
       },
     })
@@ -127,6 +129,7 @@ const currentUser = async (req, res, next) => {
           id: user.id,
           email: user.email,
           subscription: user.subscription,
+          avatar: user.avatar,
         },
       },
     })
