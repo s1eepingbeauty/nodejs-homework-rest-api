@@ -17,14 +17,14 @@ const signup = async (req, res, next) => {
     }
 
     const newUser = await Users.create(req.body)
-    const { email, subscription, avatar } = newUser
+    const { email, subscription, avatarURL } = newUser
     return res.status(HttpCode.CREATED).json({
       status: 'success',
       code: HttpCode.CREATED,
       data: {
         email,
         subscription,
-        avatar,
+        avatar: avatarURL,
       },
     })
   } catch (error) {
@@ -60,7 +60,7 @@ const login = async (req, res, next) => {
           id: user.id,
           email: user.email,
           subscription: user.subscription,
-          avatar: user.avatar,
+          avatar: user.avatarURL,
         },
       },
     })
@@ -129,7 +129,7 @@ const currentUser = async (req, res, next) => {
           id: user.id,
           email: user.email,
           subscription: user.subscription,
-          avatar: user.avatar,
+          avatar: user.avatarURL,
         },
       },
     })
