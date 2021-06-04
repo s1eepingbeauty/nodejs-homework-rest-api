@@ -138,10 +138,19 @@ const currentUser = async (req, res, next) => {
   }
 }
 
+const avatars = async (req, res, next) => {
+  try {
+    return res.json({})
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   signup,
   login,
   logout,
   patch,
   currentUser,
+  avatars,
 }
