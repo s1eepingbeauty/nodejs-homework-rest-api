@@ -24,11 +24,13 @@ class Upload {
     await this.transformAvatar(pathFile) // трансформируем файл аватарки
     const folderUserAvatar = path.join(this.AVATARS_OF_USERS, idUser) // подготавливаем папку для файла
     await createFolderIsNotExist(folderUserAvatar) // если папки нет - создаем ее
-    await fs.rename(pathFile, path.join(folderUserAvatar, nameFile)) // переносим файл из папки upload в images
-    // удаляем, если в images был старый аватар
-    await this.deleteOldAvatar(
-      path.join(process.cwd(), this.AVATARS_OF_USERS, oldFile),
-    )
+    await fs.rename(pathFile, path.join(folderUserAvatar, nameFile)) // переносим файл из папки tmp в public/avatars
+    // удаляем старый аватар
+    if (!oldFile.includes('https://s.gravatar.com')) {
+      await this.deleteOldAvatar(
+        path.join(process.cwd(), this.AVATARS_OF_USERS, oldFile),
+      )
+    }
     const avatarURL = path.normalize(path.join(idUser, nameFile))
 
     return avatarURL
