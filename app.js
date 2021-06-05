@@ -1,6 +1,7 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
+const path = require('path')
 const boolParser = require('express-query-boolean')
 const helmet = require('helmet')
 const usersRouter = require('./routes/api/users')
@@ -13,6 +14,11 @@ const app = express()
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
 
 app.use(helmet()) // прячет, подменяет заголовки (headers) для безопасности
+
+require('dotenv').config()
+const AVATARS_OF_USERS = process.env.AVATARS_OF_USERS
+app.use(express.static(path.join(__dirname, AVATARS_OF_USERS))) // раздача статики для папки public/avatars
+
 app.use(limiter) // защита он DDoS атак
 app.use(logger(formatsLogger))
 app.use(cors())

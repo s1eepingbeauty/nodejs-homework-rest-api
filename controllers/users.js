@@ -2,7 +2,10 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const Users = require('../model/users')
 const { HttpCode } = require('../helpers/constants')
+const UploadAvatar = require('../services/upload-avatars-local')
+
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
+const AVATARS_OF_USERS = process.env.AVATARS_OF_USERS
 
 const signup = async (req, res, next) => {
   try {
@@ -77,10 +80,9 @@ const logout = async (req, res, _next) => {
 }
 
 const patch = async (req, res, next) => {
-  const userId = req.user.id
-  const body = req.body
-
   try {
+    const userId = req.user.id
+    const body = req.body
     const user = await Users.updateSubscription(userId, body)
 
     if (user) {
@@ -140,7 +142,22 @@ const currentUser = async (req, res, next) => {
 
 const avatars = async (req, res, next) => {
   try {
-    return res.json({})
+    const userId = req.user.id
+    const uploads = new UploadAvatar(AVATARS_OF_USERS)
+    const avatarURL = await uploads.saveAvatarToStatic({
+      idUser: userId,
+      pathFile: req.file.path,
+      nameFile: req.file.filename,
+      oldFile: req.user.avatarURL,
+    })
+
+    await Users.updateAvatar(userId, avatarURL)
+
+    return res.json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: { avatarURL },
+    })
   } catch (error) {
     next(error)
   }

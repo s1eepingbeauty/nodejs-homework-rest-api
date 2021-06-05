@@ -22,7 +22,6 @@ const upload = multer({
     // которое показывает, следует ли принять файл
 
     // Если не картинка - отклонить файл
-    console.log(file.mimetype)
     if (!file.mimetype.includes('image')) {
       cb(null, false)
       return

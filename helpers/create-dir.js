@@ -9,7 +9,7 @@ const isAccessible = path => {
 
 const createFolderIsNotExist = async folder => {
   if (!(await isAccessible(folder))) {
-    await fs.mkdir(folder)
+    await fs.mkdir(folder, { recursive: true })
   }
 }
 
