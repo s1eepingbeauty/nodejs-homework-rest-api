@@ -14,5 +14,6 @@ router.post('/logout', guard, ctrl.logout)
 router.patch('/:userId/subscription', guard, validateSubscription, ctrl.patch)
 router.get('/current', guard, ctrl.currentUser)
 router.patch('/avatars', [guard, upload.single('avatar')], ctrl.avatars) // 1(single) картинка с именем поля avatar
+router.get('/verify/:verificationToken', ctrl.verify)
 
 module.exports = router

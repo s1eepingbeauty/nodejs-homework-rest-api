@@ -3,6 +3,11 @@ require('dotenv').config()
 const Users = require('../model/users')
 const { HttpCode } = require('../helpers/constants')
 const UploadAvatar = require('../services/upload-avatars-local')
+const EmailService = require('../services/email')
+const {
+  CreateSenderSendgrid,
+  CreateSenderNodemailer,
+} = require('../services/sender-email')
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 const AVATARS_OF_USERS = process.env.AVATARS_OF_USERS
@@ -20,11 +25,22 @@ const signup = async (req, res, next) => {
     }
 
     const newUser = await Users.create(req.body)
-    const { email, subscription, avatarURL } = newUser
+    const { name, email, subscription, avatarURL, verifyToken } = newUser
+    // TODO: send email
+    try {
+      const emailService = new EmailService(
+        process.env.NODE_ENV,
+        new CreateSenderSendgrid(),
+      )
+      await emailService.sendVerifyPasswordEmail(verifyToken, email, name)
+    } catch (error) {
+      console.log(error.message)
+    }
     return res.status(HttpCode.CREATED).json({
       status: 'success',
       code: HttpCode.CREATED,
       data: {
+        name,
         email,
         subscription,
         avatar: avatarURL,
@@ -42,7 +58,7 @@ const login = async (req, res, next) => {
     const user = await Users.findByEmail(email)
     const isValidPassword = await user?.validPassword(password)
 
-    if (!user || !isValidPassword) {
+    if (!user || !isValidPassword || !user.verify) {
       return res.status(HttpCode.UNAUTHORIZED).json({
         status: 'error',
         code: HttpCode.UNAUTHORIZED,
@@ -163,6 +179,10 @@ const avatars = async (req, res, next) => {
   }
 }
 
+const verify = async (req, res, next) => {}
+
+const repeatSendEmailVerify = async (req, res, next) => {}
+
 module.exports = {
   signup,
   login,
@@ -170,4 +190,6 @@ module.exports = {
   patch,
   currentUser,
   avatars,
+  verify,
+  repeatSendEmailVerify,
 }
