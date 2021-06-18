@@ -41,13 +41,13 @@ const userSchema = new Schema(
         return gravatar.url(this.email, { s: 250 }, true)
       },
     },
-    verify: {
+    isVerified: {
       type: Boolean,
       default: false,
     },
-    verifyToken: {
+    verificationToken: {
       type: String,
-      required: [true, 'Verify token is required'],
+      required: [true, 'Verification token is required'],
       default: nanoid(),
     },
   },

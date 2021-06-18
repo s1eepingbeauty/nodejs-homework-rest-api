@@ -2,6 +2,16 @@ const Joi = require('joi')
 const validate = require('./validate')
 
 const userSchema = Joi.object({
+  name: Joi.string()
+    .min(3)
+    .max(30)
+    .regex(/[A-Z]\w+/)
+    .messages({
+      'string.empty': `"name" cannot be an empty field`,
+      'string.min': `"name" should contains at least 3 characters`,
+      'string.max': `"name" limit is 30 characters`,
+      'any.required': `"name" is a required field`,
+    }),
   email: Joi.string()
     .email({
       minDomainSegments: 2,
@@ -24,6 +34,9 @@ const userSchema = Joi.object({
     'any.required': `"password" is a required field`,
   }),
   subscription: Joi.string().valid('starter', 'pro', 'business').optional(),
+  avatarURL: Joi.string(),
+  isVerified: Joi.boolean(),
+  verificationToken: Joi.string(),
 })
 
 const subscriptionSchema = Joi.object({

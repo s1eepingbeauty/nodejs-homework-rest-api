@@ -8,6 +8,10 @@ const findByEmail = async email => {
   return await User.findOne({ email })
 }
 
+const getUserByVerificationToken = async verificationToken => {
+  return await User.findOne({ verificationToken })
+}
+
 const create = async options => {
   const user = new User(options)
   return await user.save()
@@ -29,11 +33,18 @@ const updateAvatar = async (id, avatarURL) => {
   return await User.updateOne({ _id: id }, { avatarURL })
 }
 
+// устанавливаем verificationToken в null, а поле isVerified ставим равным true
+const updateVerificationToken = async (id, isVerified, verificationToken) => {
+  return await User.updateOne({ _id: id }, { isVerified, verificationToken })
+}
+
 module.exports = {
   findById,
   findByEmail,
+  getUserByVerificationToken,
   create,
   updateToken,
   updateSubscription,
   updateAvatar,
+  updateVerificationToken,
 }

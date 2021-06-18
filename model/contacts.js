@@ -7,13 +7,13 @@ const getContacts = async (userId, query) => {
     sortBy,
     sortByDesc,
     filter,
-    favorite = null,
+    isFavorite = null,
   } = query
 
   const optionsSearch = { owner: userId }
 
-  if (favorite !== null) {
-    optionsSearch.favorite = favorite
+  if (isFavorite !== null) {
+    optionsSearch.isFavorite = isFavorite
   }
 
   const results = await Contact.paginate(optionsSearch, {

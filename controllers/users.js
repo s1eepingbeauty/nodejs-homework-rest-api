@@ -25,14 +25,14 @@ const signup = async (req, res, next) => {
     }
 
     const newUser = await Users.create(req.body)
-    const { name, email, subscription, avatarURL, verifyToken } = newUser
+    const { name, email, subscription, avatarURL, verificationToken } = newUser
     // TODO: send email
     try {
       const emailService = new EmailService(
         process.env.NODE_ENV,
         new CreateSenderSendgrid(),
       )
-      await emailService.sendVerifyPasswordEmail(verifyToken, email, name)
+      await emailService.sendVerifyPasswordEmail(verificationToken, email, name)
     } catch (error) {
       console.log(error.message)
     }
@@ -58,11 +58,11 @@ const login = async (req, res, next) => {
     const user = await Users.findByEmail(email)
     const isValidPassword = await user?.validPassword(password)
 
-    if (!user || !isValidPassword || !user.verify) {
+    if (!user || !isValidPassword || !user.isVerified) {
       return res.status(HttpCode.UNAUTHORIZED).json({
         status: 'error',
         code: HttpCode.UNAUTHORIZED,
-        message: 'Email or password is wrong',
+        message: 'Wrong credentials supplied',
       })
     }
 
@@ -179,9 +179,30 @@ const avatars = async (req, res, next) => {
   }
 }
 
-const verify = async (req, res, next) => {}
+const verify = async (req, res, next) => {
+  try {
+    const user = await Users.getUserByVerificationToken(
+      req.params.verificationToken,
+    )
+    if (user) {
+      await Users.updateVerificationToken(user.id, true, null)
+      return res.status(HttpCode.OK).json({
+        status: 'success',
+        code: HttpCode.OK,
+        message: 'Verification successful',
+      })
+    }
+    return res.status(HttpCode.NOT_FOUND).json({
+      status: 'error',
+      code: HttpCode.NOT_FOUND,
+      message: 'User not found',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
-const repeatSendEmailVerify = async (req, res, next) => {}
+const repeatSendVerifyEmail = async (req, res, next) => {}
 
 module.exports = {
   signup,
@@ -191,5 +212,5 @@ module.exports = {
   currentUser,
   avatars,
   verify,
-  repeatSendEmailVerify,
+  repeatSendVerifyEmail,
 }
