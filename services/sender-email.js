@@ -13,7 +13,7 @@ class CreateSenderSendgrid {
 
 class CreateSenderNodemailer {
   async send(msg) {
-    const config = {
+    const options = {
       host: 'smtp.meta.ua',
       port: 465,
       secure: true,
@@ -23,7 +23,7 @@ class CreateSenderNodemailer {
       },
     }
 
-    const transporter = nodemailer.createTransport(config)
+    const transporter = nodemailer.createTransport(options)
     const emailOptions = {
       from: config.email.nodemailer,
       ...msg,

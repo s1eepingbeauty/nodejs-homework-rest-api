@@ -212,46 +212,43 @@ const verify = async (req, res, next) => {
 }
 
 const repeatSendVerifyEmail = async (req, res, next) => {
-  try {
-    const user = await Users.findByEmail(req.body.email)
+  const user = await Users.findByEmail(req.body.email)
 
-    if (user) {
-      const { name, email, verify, verificationToken } = user
+  if (user) {
+    const { name, email, verify, verificationToken } = user
 
-      if (!verify) {
-        try {
-          const emailService = new EmailService(
-            process.env.NODE_ENV,
-            new CreateSenderNodemailer(),
-          )
-          await emailService.sendVerifyPasswordEmail(
-            verificationToken,
-            email,
-            name,
-          )
-          return res.status(HttpCode.OK).json({
-            status: 'success',
-            code: HttpCode.OK,
-            message: 'Verification email sent',
-          })
-        } catch (error) {
-          console.log(error.message)
-        }
+    if (!verify) {
+      try {
+        const emailService = new EmailService(
+          process.env.NODE_ENV,
+          new CreateSenderNodemailer(),
+        )
+        await emailService.sendVerifyPasswordEmail(
+          verificationToken,
+          email,
+          name,
+        )
+        return res.status(HttpCode.OK).json({
+          status: 'success',
+          code: HttpCode.OK,
+          message: 'Verification email sent',
+        })
+      } catch (error) {
+        console.log(error.message)
+        return next(error)
       }
-      return res.status(HttpCode.BAD_REQUEST).json({
-        status: 'error',
-        code: HttpCode.BAD_REQUEST,
-        message: 'Verification has already been passed',
-      })
     }
-    return res.status(HttpCode.NOT_FOUND).json({
+    return res.status(HttpCode.CONFLICT).json({
       status: 'error',
-      code: HttpCode.NOT_FOUND,
-      message: 'User not found',
+      code: HttpCode.CONFLICT,
+      message: 'Verification has already been passed',
     })
-  } catch (error) {
-    next(error)
   }
+  return res.status(HttpCode.NOT_FOUND).json({
+    status: 'error',
+    code: HttpCode.NOT_FOUND,
+    message: 'User not found',
+  })
 }
 
 module.exports = {
