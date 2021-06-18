@@ -58,11 +58,20 @@ const login = async (req, res, next) => {
     const user = await Users.findByEmail(email)
     const isValidPassword = await user?.validPassword(password)
 
-    if (!user || !isValidPassword || !user.isVerified) {
+    if (!user || !isValidPassword) {
       return res.status(HttpCode.UNAUTHORIZED).json({
         status: 'error',
         code: HttpCode.UNAUTHORIZED,
-        message: 'Wrong credentials supplied',
+        message: 'Email or password is wrong',
+      })
+    }
+
+    if (!user.isVerified) {
+      return res.status(HttpCode.UNAUTHORIZED).json({
+        status: 'error',
+        code: HttpCode.UNAUTHORIZED,
+        message:
+          'New account was successfully registered. Please check your Email to activate the account (spam folder of your mailbox first)',
       })
     }
 
@@ -202,7 +211,48 @@ const verify = async (req, res, next) => {
   }
 }
 
-const repeatSendVerifyEmail = async (req, res, next) => {}
+const repeatSendVerifyEmail = async (req, res, next) => {
+  try {
+    const user = await Users.findByEmail(req.body.email)
+
+    if (user) {
+      const { name, email, verify, verificationToken } = user
+
+      if (!verify) {
+        try {
+          const emailService = new EmailService(
+            process.env.NODE_ENV,
+            new CreateSenderNodemailer(),
+          )
+          await emailService.sendVerifyPasswordEmail(
+            verificationToken,
+            email,
+            name,
+          )
+          return res.status(HttpCode.OK).json({
+            status: 'success',
+            code: HttpCode.OK,
+            message: 'Verification email sent',
+          })
+        } catch (error) {
+          console.log(error.message)
+        }
+      }
+      return res.status(HttpCode.BAD_REQUEST).json({
+        status: 'error',
+        code: HttpCode.BAD_REQUEST,
+        message: 'Verification has already been passed',
+      })
+    }
+    return res.status(HttpCode.NOT_FOUND).json({
+      status: 'error',
+      code: HttpCode.NOT_FOUND,
+      message: 'User not found',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 module.exports = {
   signup,

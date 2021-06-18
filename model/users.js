@@ -33,7 +33,7 @@ const updateAvatar = async (id, avatarURL) => {
   return await User.updateOne({ _id: id }, { avatarURL })
 }
 
-// устанавливаем verificationToken в null, а поле isVerified ставим равным true
+// устанавливаем isVerified равным true, а поле verificationToken в null
 const updateVerificationToken = async (id, isVerified, verificationToken) => {
   return await User.updateOne({ _id: id }, { isVerified, verificationToken })
 }
