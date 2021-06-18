@@ -33,7 +33,7 @@ const createContactSchema = Joi.object({
       'any.required': `"phone" is a required field`,
       'string.pattern.base': `"phone" is not valid [example: (704) 398-7993]`,
     }),
-  favorite: Joi.boolean().optional(),
+  isFavorite: Joi.boolean().optional(),
 })
 
 const updateContactSchema = Joi.object({
@@ -66,13 +66,13 @@ const updateContactSchema = Joi.object({
       'string.pattern.base': `"phone" is not valid [example: (704) 398-7993]`,
     }),
 
-  favorite: Joi.boolean().optional(),
+  isFavorite: Joi.boolean().optional(),
 })
 
 const statusFavoriteSchema = Joi.object({
-  favorite: Joi.boolean().required().messages({
-    'string.empty': `"favorite" cannot be an empty field`,
-    'any.required': `"favorite" is a required field`,
+  isFavorite: Joi.boolean().required().messages({
+    'string.empty': `"isFavorite" cannot be an empty field`,
+    'any.required': `"isFavorite" is a required field`,
   }),
 })
 

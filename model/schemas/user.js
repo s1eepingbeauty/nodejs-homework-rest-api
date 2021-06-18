@@ -1,13 +1,17 @@
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
 const bcrypt = require('bcryptjs')
-const { Schema, model } = mongoose
 const gravatar = require('gravatar')
+const { nanoid } = require('nanoid')
 const { Subscription } = require('../../helpers/constants')
 
 const SALT_FACTOR = 6
 
 const userSchema = new Schema(
   {
+    name: {
+      type: String,
+      default: 'Guest',
+    },
     email: {
       type: String,
       required: [true, 'Email is required'],
@@ -36,6 +40,15 @@ const userSchema = new Schema(
       default: function () {
         return gravatar.url(this.email, { s: 250 }, true)
       },
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, 'Verification token is required'],
+      default: nanoid(),
     },
   },
   {

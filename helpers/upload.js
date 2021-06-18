@@ -23,7 +23,9 @@ const upload = multer({
 
     // Если не картинка - отклонить файл
     if (!file.mimetype.includes('image')) {
-      cb(null, false)
+      const error = new Error('Not Image!')
+      error.status = 400
+      cb(error)
       return
     }
     // Принять файл

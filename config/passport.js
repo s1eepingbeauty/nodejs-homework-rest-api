@@ -19,6 +19,9 @@ passport.use(
       if (!user.token) {
         return done(null, false)
       }
+      if (!user.isVerified) {
+        return done(null, false)
+      }
       return done(null, user)
     } catch (error) {
       return done(error, false)

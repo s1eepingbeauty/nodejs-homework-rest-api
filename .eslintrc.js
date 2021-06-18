@@ -8,5 +8,8 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 12,
   },
+  'eslint.options': {
+    experimentalDecorators: true,
+  },
   rules: {},
 }
